@@ -1,0 +1,84 @@
+.modal .modal-title {
+    display: inline-block;
+    font-size: 20px;
+}
+
+.modal .modal-header .close {
+    margin-top: 2px;
+}
+
+.modal td, th {
+    padding-bottom: 10px;
+}
+
+.modal .modal-body .title {
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.id {
+    display: none;
+}
+
+.panel-heading {
+    line-height: 35px;
+    font-size: 21px;
+}
+
+.add-user-btn {
+    float: right;
+}
+
+.help {
+    font-size: 12px;
+    color: #ff0000;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+.table > thead > tr > th {
+
+}
+
+.table > tbody > tr > td,
+.table > tbody > tr > th,
+.table > tfoot > tr > td,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > thead > tr > th {
+    font-size: 14px;
+    text-align: center;
+    line-height: 34px !important;
+}
+
+.page-header .btn-wrapper {
+    float: right;
+    font-size: 22px;
+}
+
+.page-header .btn-wrapper button {
+    height: 44px;
+}
+
+.glyphicon-expand {
+    font-size: 30px;
+    color: #60c522;
+}
+
+.loading-bar {
+    display: inline-block;
+    background-image: url(/images/loading.gif);
+    background-size: 30px;
+    background-repeat: no-repeat;
+    width: 30px;
+    height: 30px;
+    vertical-align: middle;
+    margin-top: -5px;
+    margin-left: 10px;
+}
+
+/*
+.pending-wrapper {
+    display: none;
+}
+*/

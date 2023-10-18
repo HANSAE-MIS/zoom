@@ -1,0 +1,623 @@
+<html>
+  <head>
+    <title>HANSAE ZOOMCALL</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+        <link rel="stylesheet" href="ThirdParty/jQuery/jquery-ui-1.12.1.custom/jquery-ui.css" crossorigin="anonymous">
+        <link rel="stylesheet" href="ThirdParty/bootstrap/css/bootstrap.min.css" crossorigin="anonymous">
+        <link rel="stylesheet" href="ThirdParty/bootstrap/css/bootstrap-theme.min.css" crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="container">
+        <div class="page-header">
+            <h1>
+                HANSAE
+                <small>ZOOMCALL</small>
+                <div class="btn-wrapper">
+                    <button type="button" class="help-btn btn btn-default btn-warning btn-lg">
+                        <span>HELP</span>
+                    </button>
+                    <button type="button" class="download-btn btn btn-default btn-lg">
+                        <span>DOWNLOAD</span>
+                    </button>
+                    <button type="button" class="refresh-btn btn btn-default btn-lg">
+                        <span class="glyphicon glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </h1>
+        </div>
+        <div class="panel panel-default meetings-wrapper">
+            <div class="panel-heading">
+                <span class="heading-title">LIVE MEETINGS</span>
+                <span class="loading-bar"></span>
+            </div>
+            <div class="panel-body">
+                <table class="table live-meetings-table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col" width="20%;">Email</th>
+                            <th scope="col">Meeting ID</th>
+                            <th scope="col">Host</th>
+                            <th scope="col">Start Time</th>
+                            <th scope="col">Participants</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <span class="help">* ZOOMCALL 사용자는 최대 15명까지 등록 가능하며 등록된 계정이 15개를 초과하였을 경우 기존에 등록된 계정을 삭제 후 추가하시기 바랍니다.</span>
+        <span class="help">* LIVE MEETINGS 에서 사용중인 계정을 실시간으로 확인 할 수 있으며 사용중인 계정은 삭제 할 수 없습니다.</span>
+        <div class="panel panel-default users-wrapper">
+            <div class="panel-heading">
+                <span class="heading-title">USERS</span>
+                <span class="loading-bar"></span>
+                <input type="button" value="Add Users" class="add-user-btn btn btn-default btn-primary" />
+            </div>
+            <div class="panel-body">
+                <table class="table users-table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col" width="20%;">Email</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Department</th>
+                            <th scope="col">Creation Date</th>
+                            <th scope="col">Last Login Time</th>
+                            <th scope="col" class="id">ID</th>
+                            <th scope="col" width="10%"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel panel-default pending-wrapper">
+            <div class="panel-heading">
+                <span class="heading-title">PENDING</span>
+                <span class="loading-bar"></span>
+            </div>
+            <div class="panel-body">
+                <table class="table pending-table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col" width="20%;">Email</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Department</th>
+                            <th scope="col">Creation Date</th>
+                            <th scope="col" class="id">ID</th>
+                            <th scope="col" width="10%"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="add-users-modal modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Users</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="title">You can add users to your account.</div>
+                    <table class="dialog" cellpadding="0" cellspacing="0" style="width:100%;">
+                        <tbody>
+                            <tr class="emails">
+                                <td class="col1">
+                                    <label>Email</label>
+                                </td>
+                                <td>
+                                    <input type="text" id="user-email-input" name="user-email-input" class="form-control user-email-input" maxlength="128">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary submit">Add</button>
+                    <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="ThirdParty/jQuery/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="ThirdParty/jQuery/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
+    <script type="text/javascript" src="ThirdParty/underscore/underscore-min.js"></script>
+    <script type="text/javascript" src="ThirdParty/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="ThirdParty/moment/moment.min.js"></script>
+    <script type="text/javascript">
+        const TOKEN = 'token';
+        // $.ajaxPrefilter(function(options, originalOption, jqXHR) {
+        //     jqXHR.setRequestHeader("Authoriazition", `bearer ${getToken()}`);
+        // })
+
+
+        function saveToken(token) {
+            localStorage.setItem(TOKEN, token);
+        }
+        function getToken() {
+            return localStorage.getItem(TOKEN);
+        }
+        function clearToken() {
+            localStorage.removeItem(TOKEN, token);
+        }
+
+
+        $('.download-btn').on('click', function (e) {
+
+            e.preventDefault();
+
+            window.open('http://gw.hansae.com/Storage/GW/ESS/ZoomInstaller.exe');
+        });
+
+        $('.help-btn').on('click', function (e) {
+
+            e.preventDefault();
+
+            window.open('https://gw.hansae.com/enovator/gw/ess/ess_view.aspx?form_cd=2207');
+        });
+
+        $('.refresh-btn').on('click', function (e) {
+
+            e.preventDefault();
+
+            location.reload();
+        });
+
+        $('.add-user-btn').on('click', function (e) {
+
+            e.preventDefault();
+
+            var userCnt = $('.users-table').find('tbody tr').length;
+            var pendingCnt = $('.pending-table').find('tbody tr').length;
+
+            if (userCnt + pendingCnt >= 15) {
+
+                alert('Cannot add anymore.\nTry deleting the users first and try it again.');
+
+                return;
+            }
+
+            $('.add-users-modal').modal('show');
+        });
+
+        $('.add-users-modal .submit').on('click', function (e) {
+
+            e.preventDefault();
+
+            var email = $('.user-email-input').val();
+
+            var regex = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
+
+            if (regex.test(email) === false) {
+
+                alert("[a-z],[A-Z],[0-9],[.@] 문자만 가능합니다");
+
+                return false;
+            }
+
+            if (email.indexOf('@hansae.com') == -1 && email.indexOf('@colorntouch.com') == -1) {
+
+                alert('@hansae.com , @colorntouch.com 메일 계정만 라이선스 추가 가능합니다.');
+
+                return;
+            }
+
+            var userList = $('.users-table').data('user-list');
+
+            var userCheck = false;
+            var userId = null;
+
+            if (userList) {
+
+                for (var i = 0; i < userList.length; i++) {
+
+                    var user = userList[i];
+
+                    if (email == user['email']) {
+
+                        userCheck = true;
+                        userId = user['id'];
+
+                        break;
+                    }
+                }
+            }
+
+            if (userCheck) {
+
+                var parameters = {
+                    userId: userId,
+                    type: 2
+                };
+
+                updateUser(parameters);
+
+            } else {
+
+                var parameters = {
+                    email: $('.user-email-input').val()
+                };
+
+                createUser(parameters);
+            }
+        });
+
+        $('.table').on('click', '.user-delete-btn', function (e) {
+
+            e.preventDefault();
+
+            var conf = confirm('Do you want to delete it?');
+
+            if (conf) {
+
+                $('.users-wrapper').find('.loading-bar').css('display', 'inline-block');
+
+                var tr = $(this).parents('tr');
+
+                var parameters = {
+                    userId: tr.find('.id').html(),
+                    email: tr.find('.email').html(),
+                    type: 1
+                };
+
+                updateUser(parameters);
+            }
+        });
+
+        $('.table').on('click', '.pending-delete-btn', function (e) {
+
+            e.preventDefault();
+
+            var conf = confirm('Do you want to delete it?');
+
+            if (conf) {
+
+                var tr = $(this).parents('tr');
+
+                var parameters = {
+                    userId: tr.find('.id').html(),
+                    email: tr.find('.email').html(),
+                    type: 1
+                };
+
+                deleteUser(parameters);
+
+                // updateUser(parameters);
+            }
+        });
+
+        var meetingCallback = function  (meetings) {
+
+            if (meetings['error']) {
+
+                alert('Failed to receive Live Meetings information.\nPlease try refreshing it.');
+
+                return;
+            }
+
+            setMeetingList(meetings['meetings']);
+        };
+
+        //alert('줌콜 사용자 등록을 원하시는 분께서는\n경영정보팀으로 연락 바랍니다.\n\n이용현 주임\n02-3779-5153\n\n김상효 주임\n02-3779-5118');
+        //alert('새로 오픈 예정');
+        // getMeetingList(meetingCallback);
+
+        setTimeout(function () {
+            getUserList();
+
+        }, 0);
+
+        setTimeout(function () {
+
+            // getPendingUserList();
+
+        }, 2000);
+
+        function setMeetingList (meetings) {
+
+            var table = $('.live-meetings-table');
+            var tableBody = table.find('tbody');
+
+            tableBody.empty();
+
+            for (var i = 0; i < meetings.length; i++) {
+
+                var item = meetings[i];
+                var tr  = '<tr>'
+                        +   '<td class="email">' + item['email'] + '</td>'
+                        +   '<td class="meeting_id">' + item['id'] + '</td>'
+                        +   '<td class="host">' + item['host'] + '</td>'
+                        +   '<td class="start_time">' + moment(item['start_time']).format("YYYY-MM-DD HH:mm") + '</td>'
+                        +   '<td class="participants">' + item['participants'] + '</td>'
+                        + '</tr>';
+
+                tableBody.append(tr);
+            }
+        }
+
+        function getMeetingList (callback) {
+            $('.meetings-wrapper').find('.loading-bar').css('display', 'inline-block');
+
+            var parameters = {
+                type: 'live',
+                from: '2017-01-01',
+                to: '2999-12-31'
+            };
+
+            $.post(
+                '/api/getMeetingList',
+                parameters,
+                function (data) {
+					var result = data.result;
+					result = JSON.parse(result);
+					//alert(result);
+                    $('.meetings-wrapper').find('.loading-bar').css('display', 'none');
+                    callback(result);
+                },
+                'json'
+            );
+        }
+
+        function getUserList () {
+			//alert("here");
+            $('.users-wrapper').find('.loading-bar').css('display', 'inline-block');
+
+            var parameters = null;
+
+            $.post(
+                '/api/getUserList',
+                parameters,
+                function (data) {
+					var result = data.result;
+					result = JSON.parse(result);
+                    var users = [];
+                    var mis = null;
+                    var master = 'mis@hansae.com';
+                    var admin = [
+                        //'jennycho@hansae.com','khgo@hansae.com','minjijeon@hansae.com'
+                    ];
+
+                    for (var i = 0; i < result.length; i++) {
+                        var item = result[i];
+                        if (item['email'] == master) {
+                            item['admin'] = 'Y';
+                            mis = item;
+                        } else if (admin.indexOf(item['email']) > -1) {
+                            item['admin'] = 'Y';
+                            users.unshift(item);
+                        } else if(item['role_id'] <= 1){ // role_id 추가함 (임석영)
+                            item['admin'] = 'Y';
+                            users.unshift(item);
+                        } else {
+                            item['admin'] = 'N';
+                            users.push(item);
+                        }
+                    }
+
+                    users.unshift(mis);
+                    var table = $('.users-table');
+                    table.data('user-list', users);
+                    var tableBody = table.find('tbody');
+                    tableBody.empty();
+
+                    for (var i = 0; i < users.length; i++) {
+                        var user = users[i];
+                        if (user['type'] != 2) {
+
+                            continue;
+                        }
+                        var deleteBtn = '';
+                        if (user['admin'] == 'N') {
+
+                            deleteBtn = '<input type="button" value="Delete" class="user-delete-btn btn btn-default btn-warning" />';
+                        }
+
+                        var tr  = '<tr>'
+                                +   '<td class="email">' + user['email'] + '</td>'
+                                +   '<td class="first_name">' + nullcheck(user['first_name']) + ' ' +  nullcheck(user['last_name']) + '</td>'
+                                +   '<td class="dept">' + nullcheck(user['dept']) + '</td>'
+                                +   '<td class="created_at">' + moment(user['created_at']).format("YYYY-MM-DD HH:mm") + '</td>'
+                                +   '<td class="last_login_time">' + moment(user['last_login_time']).format("YYYY-MM-DD HH:mm") + '</td>'
+                                +   '<td class="id">' + user['id'] + '</td>'
+                                +   '<td>' + deleteBtn + '</td>'
+                                + '</tr>';
+
+                        tableBody.append(tr);
+                    }
+                    $('.users-wrapper').find('.loading-bar').css('display', 'none');
+                },
+                'json'
+            );
+        }
+
+        function getPendingUserList () {
+            $('.pending-wrapper').find('.loading-bar').css('display', 'inline-block');
+            var parameters = null
+            $.post(
+                '/api/getPendingUserList',
+                parameters,
+                function (data) {
+                    var result = data.result;
+					result = JSON.parse(result);
+                    var table = $('.pending-table');
+                    var tableBody = table.find('tbody');
+
+                    tableBody.empty();
+                    for (var i = 0; i < result.length; i++) {
+                        var item = result[i];
+                        tr  = '<tr>'
+                            +   '<td class="email">' + item['email'] + '</td>'
+                            +   '<td class="first_name">' + nullcheck(item['first_name']) + ' ' + nullcheck(item['last_name']) + '</td>'
+                            +   '<td class="dept">' + nullcheck(item['dept']) + '</td>'
+                            +   '<td class="created_at">' + moment(item['created_at']).format("YYYY-MM-DD HH:mm") + '</td>'
+                            +   '<td class="id">' + item['id'] + '</td>'
+                            +   '<td><input type="button" value="Delete" class="pending-delete-btn btn btn-default btn-warning" /></td>'
+                            + '</tr>';
+                        tableBody.append(tr);
+                    }
+                    $('.pending-wrapper').find('.loading-bar').css('display', 'none');
+                },
+                'json'
+            );
+        }
+
+        function createUser (parameters) {
+            $.post(
+                '/api/createUser',
+                parameters,
+                function (data) {
+                    var result = data['result'];
+                    if (result['message']) {
+                        alert(result['message']);
+                        return;
+                    }
+                    getUserList();
+                    getPendingUserList();
+                    $('.add-users-modal').modal('hide');
+                },
+                'json'
+            );
+        }
+
+        function updateUser (parameters) {
+            var callback = function (meetings) {
+				/*
+				if (meetings['error']) {
+                    alert('Please try it again.');
+                    return;
+                }
+				*/
+                var check = true;
+                for (var i = 0; i < meetings.length; i++) {
+                    if (meetings[i]['email'] == parameters['email']) {
+						console.log("in");
+                        check = false;
+                        break;
+                    }
+                }
+
+                if (!check) {
+                    alert('Cannot delete while in a meeting.');
+                    return;
+                }
+
+                setTimeout(function () {
+                    $.post(
+                        '/api/updateUser',
+                        parameters,
+                        function (data) {
+                            var result = data;
+							console.log("Kek");
+
+							console.log(data);
+                            if (result['error']) {
+                                alert(result['error']['message']);
+                                return;
+                            }
+
+                            if (parameters['type'] == 1) {
+                                alert('Deletion completed.');
+                            } else if (parameters['type'] == 2) {
+                                alert('successfully added.');
+                                $('.add-users-modal').modal('hide');
+                            }
+                            getUserList();
+                            getPendingUserList();
+                        },
+                        'json'
+                    );
+                }, 0);
+            }
+            getMeetingList(callback);
+        }
+
+        function deleteUser (parameters) {
+            var callback = function (meetings) {
+				if (meetings['error']) {
+                    alert('Please try it again.');
+                    return;
+                }
+
+                var check = true;
+                for (var i = 0; i < meetings.length; i++) {
+                    if (meetings[i]['email'] == parameters['email']) {
+						console.log("in");
+                        check = false;
+                        break;
+                    }
+                }
+
+                if (!check) {
+                    alert('Cannot delete while in a meeting.');
+                    return;
+                }
+
+                setTimeout(function () {
+                    $.post(
+                        '/api/deleteUser',
+                        parameters,
+                        function (data) {
+                            var result = data;
+							console.log("Kek");
+
+							console.log(data);
+                            if (result['error']) {
+                                alert(result['error']['message']);
+                                return;
+                            }
+
+                            if (parameters['type'] == 1) {
+                                alert('Deletion completed.');
+                            } else if (parameters['type'] == 2) {
+                                alert('successfully added.');
+                                $('.add-users-modal').modal('hide');
+                            }
+                            getUserList();
+                            getPendingUserList();
+                        },
+                        'json'
+                    );
+                }, 0);
+            }
+            getMeetingList(callback);
+        }
+
+        function nullcheck (value) {
+            if (!value) {
+                value = '';
+            }
+            return value;
+        }
+
+
+
+
+        // async function getEvent() {
+        //     return await Promise.all(getUserList(), getPendingUserList(), getMeetingList(function(response) {
+        //         setMeetingList(response);
+        //     }))
+        // }
+
+
+		document.addEventListener("DOMContentLoaded", function(){
+            console.log(getToken())
+			getUserList();
+			getPendingUserList();
+			getMeetingList(function(response) {
+				setMeetingList(response);
+			});
+		});
+
+		window.addEventListener('load', function () {
+			alert("기존 사용자에게 예약여부 확인 후 이용바랍니다.");
+		})
+
+    </script>
+  </body>
+</html>
