@@ -130,12 +130,10 @@
     <script type="text/javascript" src="ThirdParty/underscore/underscore-min.js"></script>
     <script type="text/javascript" src="ThirdParty/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="ThirdParty/moment/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script type="text/javascript">
+        // axios.defaults.baseURL = "http://localhost:8082";
         const TOKEN = 'token';
-        // $.ajaxPrefilter(function(options, originalOption, jqXHR) {
-        //     jqXHR.setRequestHeader("Authoriazition", `bearer ${getToken()}`);
-        // })
-
 
         function saveToken(token) {
             localStorage.setItem(TOKEN, token);
@@ -146,7 +144,6 @@
         function clearToken() {
             localStorage.removeItem(TOKEN, token);
         }
-
 
         $('.download-btn').on('click', function (e) {
 
@@ -314,9 +311,7 @@
         }, 0);
 
         setTimeout(function () {
-
             // getPendingUserList();
-
         }, 2000);
 
         function setMeetingList (meetings) {
@@ -367,7 +362,6 @@
         function getUserList () {
 			//alert("here");
             $('.users-wrapper').find('.loading-bar').css('display', 'inline-block');
-
             var parameters = null;
 
             $.post(
@@ -527,8 +521,14 @@
                                 alert('successfully added.');
                                 $('.add-users-modal').modal('hide');
                             }
-                            getUserList();
-                            getPendingUserList();
+                            // getUserList();
+                            // getPendingUserList();
+                            try {
+                                new Promise.all([getUserList(), getPendingUserList()]);
+                            } catch (error) {
+                                console.log(error);
+                                initEvent();
+                            }
                         },
                         'json'
                     );
@@ -596,22 +596,47 @@
         }
 
 
+        // 백은지 추가
+        function getUserTokenApi () {
+            return axios.post('/api/getUserToken', {});
+        }
 
+        
+        // 백은지 추가 (oauth token 받아오기)
+        async function getUserToken () {
+            try {
+                const { data } = await getUserTokenApi();
+                saveToken(data.access_token);
+                return data.access_token;
+            } catch (error) {
+                console.log(error);
+                if(error.response) {
+                    const data = error.response.data;
+                    const message = data && data.message ? data.message : "something went wrong!";
+                    throw new Error(message);
+                }
+                throw new Error('connection error');
+            }
+        }
 
-        // async function getEvent() {
-        //     return await Promise.all(getUserList(), getPendingUserList(), getMeetingList(function(response) {
-        //         setMeetingList(response);
-        //     }))
-        // }
-
+        // 토큰없을때
+        async function initEvent() {
+            try {
+                await getUserToken()
+                Promise.all([getUserList(), getPendingUserList(), getMeetingList(function(response) {setMeetingList(response)})]);
+            } catch (error) {   
+                console.log(error);
+                initEvent();
+            }
+        }
 
 		document.addEventListener("DOMContentLoaded", function(){
-            console.log(getToken())
-			getUserList();
-			getPendingUserList();
-			getMeetingList(function(response) {
-				setMeetingList(response);
-			});
+            initEvent();
+			// getUserList();
+			// getPendingUserList();
+			// getMeetingList(function(response) {
+			// 	setMeetingList(response);
+			// });
 		});
 
 		window.addEventListener('load', function () {

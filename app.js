@@ -8,9 +8,12 @@ const merge = require('deepmerge');
 const request = require('request');
 const router = require('./router/main')(app);
 const bodyParser = require('body-parser');
-const querystring = require('querystring');
 const utf8 = require('utf8');
+const axios = require('axios');
 
+const querystring = require("querystring");
+
+ 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
@@ -18,9 +21,6 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 
-var access_token;
-var ownerEmail, userid, resp;
-var nextPageToken = "";
 const port = 80;
 
 //Use the ApiKey and APISecret from config.js
@@ -29,7 +29,7 @@ const payload = {
     exp: ((new Date()).getTime() + 5000)
 };
 
-const token = "";
+let token = "";
 // const token = jwt.sign(payload, config.APISecret);
 
 const asyncWrapper = asyncFn => {
@@ -60,13 +60,16 @@ function getPendingUsers(nextPageToken = "") {
 				page_size : 300,
 				status : 'pending'
 			},
-			auth: {
-				'bearer': token
-			},
+			// auth: {
+			// 	'bearer': token
+			// },
 			headers: {
-				'User-Agent': 'Zoom-api-Jwt-Request',
-				'content-type': 'application/json'
+				authorization: `Bearer ${token}`, // Do not publish or share your token publicly.
 			},
+			// headers: {
+			// 	'User-Agent': 'Zoom-api-Jwt-Request',
+			// 	'content-type': 'application/json'
+			// },
 			json: true //Parse the JSON string in the response
 		};
 	} else {
@@ -78,12 +81,15 @@ function getPendingUsers(nextPageToken = "") {
 				status : 'pending',
 				next_page_token : nextPageToken
 			},
-			auth: {
-				'bearer': token
-			},
+			// auth: {
+			// 	'bearer': token
+			// },
+			// headers: {
+			// 	'User-Agent': 'Zoom-api-Jwt-Request',
+			// 	'content-type': 'application/json'
+			// },
 			headers: {
-				'User-Agent': 'Zoom-api-Jwt-Request',
-				'content-type': 'application/json'
+				authorization: `Bearer ${token}`, // Do not publish or share your token publicly.
 			},
 			json: true //Parse the JSON string in the response
 		};
@@ -109,12 +115,15 @@ function getUsers(nextPageToken = "") {
 			qs: {
 				page_size : 300
 			},
-			auth: {
-				'bearer': token
-			},
+			// auth: {
+			// 	'bearer': token
+			// },
+			// headers: {
+			// 	'User-Agent': 'Zoom-api-Jwt-Request',
+			// 	'content-type': 'application/json'
+			// },
 			headers: {
-				'User-Agent': 'Zoom-api-Jwt-Request',
-				'content-type': 'application/json'
+				authorization: `Bearer ${token}`, // Do not publish or share your token publicly.
 			},
 			json: true //Parse the JSON string in the response
 		};
@@ -126,12 +135,15 @@ function getUsers(nextPageToken = "") {
 				page_size : 300,
 				next_page_token : nextPageToken
 			},
-			auth: {
-				'bearer': token
-			},
+			// auth: {
+			// 	'bearer': token
+			// },
+			// headers: {
+			// 	'User-Agent': 'Zoom-api-Jwt-Request',
+			// 	'content-type': 'application/json'
+			// },
 			headers: {
-				'User-Agent': 'Zoom-api-Jwt-Request',
-				'content-type': 'application/json'
+				authorization: `Bearer ${token}`, // Do not publish or share your token publicly.
 			},
 			json: true //Parse the JSON string in the response
 		};
@@ -163,12 +175,15 @@ function getLiveMeetings(nextPageToken = "") {
 				from : fromDate,
 				to : toDate
 			},
-			auth: {
-				'bearer': token
-			},
+			// auth: {
+			// 	'bearer': token
+			// },
+			// headers: {
+			// 	'User-Agent': 'Zoom-api-Jwt-Request',
+			// 	'content-type': 'application/json'
+			// },
 			headers: {
-				'User-Agent': 'Zoom-api-Jwt-Request',
-				'content-type': 'application/json'
+				authorization: `Bearer ${token}`, // Do not publish or share your token publicly.
 			},
 			json: true //Parse the JSON string in the response
 		};
@@ -183,12 +198,15 @@ function getLiveMeetings(nextPageToken = "") {
 				from : fromDate,
 				to : toDate
 			},
-			auth: {
-				'bearer': token
-			},
+			// auth: {
+			// 	'bearer': token
+			// },
+			// headers: {
+			// 	'User-Agent': 'Zoom-api-Jwt-Request',
+			// 	'content-type': 'application/json'
+			// },
 			headers: {
-				'User-Agent': 'Zoom-api-Jwt-Request',
-				'content-type': 'application/json'
+				authorization: `Bearer ${token}`, // Do not publish or share your token publicly.
 			},
 			json: true //Parse the JSON string in the response
 		};
@@ -290,12 +308,15 @@ function createUser(user) {
 				action : 'create',
 				user_info : user
 			},
-			auth: {
-				'bearer': token
-			},
+			// auth: {
+			// 	'bearer': token
+			// },
+			// headers: {
+			// 	'User-Agent': 'Zoom-api-Jwt-Request',
+			// 	'content-type': 'application/json'
+			// },
 			headers: {
-				'User-Agent': 'Zoom-api-Jwt-Request',
-				'content-type': 'application/json'
+				authorization: `Bearer ${token}`, // Do not publish or share your token publicly.
 			},
 			json: true //Parse the JSON string in the response
 		};
@@ -325,12 +346,15 @@ function deleteUser(user) {
 			body: {
 				action : 'delete'
 			},
-			auth: {
-				'bearer': token
-			},
+			// auth: {
+			// 	'bearer': token
+			// },
+			// headers: {
+			// 	'User-Agent': 'Zoom-api-Jwt-Request',
+			// 	'content-type': 'application/json'
+			// },
 			headers: {
-				'User-Agent': 'Zoom-api-Jwt-Request',
-				'content-type': 'application/json'
+				authorization: `Bearer ${token}`, // Do not publish or share your token publicly.
 			},
 			json: true //Parse the JSON string in the response
 		};
@@ -357,12 +381,15 @@ function updateUser(user) {
 			body: {
 				type : user['type']
 			},
-			auth: {
-				'bearer': token
-			},
+			// auth: {
+			// 	'bearer': token
+			// },
+			// headers: {
+			// 	'User-Agent': 'Zoom-api-Jwt-Request',
+			// 	'content-type': 'application/json'
+			// },
 			headers: {
-				'User-Agent': 'Zoom-api-Jwt-Request',
-				'content-type': 'application/json'
+				authorization: `Bearer ${token}`, // Do not publish or share your token publicly.
 			},
 			json: true //Parse the JSON string in the response
 		};
@@ -402,12 +429,15 @@ async function removeLicense(email) {
 			body: {
 				type : 1
 			},
-			auth: {
-				'bearer': token
-			},
+			// auth: {
+			// 	'bearer': token
+			// },
+			// headers: {
+			// 	'User-Agent': 'Zoom-api-Jwt-Request',
+			// 	'content-type': 'application/json'
+			// },
 			headers: {
-				'User-Agent': 'Zoom-api-Jwt-Request',
-				'content-type': 'application/json'
+				authorization: `Bearer ${token}`, // Do not publish or share your token publicly.
 			},
 			json: true //Parse the JSON string in the response
 		};
@@ -438,12 +468,15 @@ async function addLicense(email) {
 			body: {
 				type : 2
 			},
-			auth: {
-				'bearer': token
-			},
+			// auth: {
+			// 	'bearer': token
+			// },
+			// headers: {
+			// 	'User-Agent': 'Zoom-api-Jwt-Request',
+			// 	'content-type': 'application/json'
+			// },
 			headers: {
-				'User-Agent': 'Zoom-api-Jwt-Request',
-				'content-type': 'application/json'
+				authorization: `Bearer ${token}`, // Do not publish or share your token publicly.
 			},
 			json: true //Parse the JSON string in the response
 		};
@@ -473,6 +506,7 @@ app.post('/api/getMeetingList', asyncWrapper(async (req, res, next) => {
 		});
 		//res.json();
 	} catch (error) {
+		console.log("error", error)
 		next(error);
 	}
 }));
@@ -486,6 +520,8 @@ app.post('/api/getMeetingList', asyncWrapper(async (req, res, next) => {
 
 
 app.post('/api/getUserList', asyncWrapper(async (req, res, next) => {
+	// const { authorization } = req.headers;
+	// token = authorization;
 	try {
 		var userList = await getAllUsers();
 		//throw new Error('Async 사용자 정의 에러 발생');
@@ -561,7 +597,6 @@ app.post('/api/deleteUser', asyncWrapper(async (req, res, next) => {
 	var user =  {
 		userId : req.body.userId,
 	}
-
 	try {
 		var result = await deleteUser(user);
 		console.log("deleted user");
@@ -609,10 +644,31 @@ app.post('/api/updateUser', function (req, res) {
 */
 
 
+// 백은지 추가 getUserToken
+app.post('/api/getUserToken', async(req, res) => {
+	try {
+		const obj = `grant_type=account_credentials&account_id=${config.ZOOM_ACCOUNT_ID}`;
+
+		const reponse = await axios.post(
+			"https://zoom.us/oauth/token",
+			querystring.stringify({ grant_type: 'account_credentials', account_id: config.ZOOM_ACCOUNT_ID}),
+			{
+				headers: {
+					Authorization: `Basic ${Buffer.from(`${config.ZOOM_CLIENT_ID}:${config.ZOOM_CLIENT_SECRET}`).toString('base64')}`
+				},
+			},
+		);
+		const { access_token } = reponse.data;
+		token = access_token;
+		return res.status(200).json(reponse.data);
+	} catch(error) {
+		console.log(error);
+		return res.sendStatus(400).send({message: "sth wrong"})
+	}
+});
 
 
 
 app.listen(port, () => {
 	console.log(`Example app listening on port ${port}!`)
-	//console.log(getAllUsers());
 });
