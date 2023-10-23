@@ -524,7 +524,7 @@
                             // getUserList();
                             // getPendingUserList();
                             try {
-                                new Promise.all([getUserList(), getPendingUserList()]);
+                                Promise.all([getUserList(), getPendingUserList()]);
                             } catch (error) {
                                 console.log(error);
                                 initEvent();
@@ -605,9 +605,9 @@
         // 백은지 추가 (oauth token 받아오기)
         async function getUserToken () {
             try {
-                const { data } = await getUserTokenApi();
-                saveToken(data.access_token);
-                return data.access_token;
+                const data = await getUserTokenApi();
+                saveToken(data);
+                return data;
             } catch (error) {
                 console.log(error);
                 if(error.response) {

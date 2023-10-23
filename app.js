@@ -21,7 +21,7 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 
-const port = 80;
+const port = 8082;
 
 //Use the ApiKey and APISecret from config.js
 const payload = {
@@ -644,28 +644,56 @@ app.post('/api/updateUser', function (req, res) {
 */
 
 
-// 백은지 추가 getUserToken
-app.post('/api/getUserToken', async(req, res) => {
-	try {
-		const obj = `grant_type=account_credentials&account_id=${config.ZOOM_ACCOUNT_ID}`;
 
-		const reponse = await axios.post(
-			"https://zoom.us/oauth/token",
-			querystring.stringify({ grant_type: 'account_credentials', account_id: config.ZOOM_ACCOUNT_ID}),
-			{
-				headers: {
-					Authorization: `Basic ${Buffer.from(`${config.ZOOM_CLIENT_ID}:${config.ZOOM_CLIENT_SECRET}`).toString('base64')}`
-				},
-			},
-		);
-		const { access_token } = reponse.data;
-		token = access_token;
-		return res.status(200).json(reponse.data);
+
+function getUserTokenFunc() {
+	var options;
+
+	options = {
+		//You can use a different uri if you're making an API call to a different Zoom endpoint.
+		uri: `https://zoom.us/oauth/token?grant_type=account_credentials&account_id=${config.ZOOM_ACCOUNT_ID}`,
+		method: 'POST',
+		body: {
+		},
+		headers: {
+			Authorization: `Basic ${Buffer.from(`${config.ZOOM_CLIENT_ID}:${config.ZOOM_CLIENT_SECRET}`).toString('base64')}`
+		},
+		json: true //Parse the JSON string in the response
+	};
+	
+	return new Promise(function (resolve, reject) {
+		request(options, function (err, res, body) {
+			if (!err) {
+				resolve(body);
+			} else {
+				console.log(body);
+				reject(body);
+			}
+		});
+	});
+}
+
+
+// 백은지 추가 getUserToken
+app.post('/api/getUserToken', asyncWrapper(async(req, res) => {
+	try {
+		// const reponse = await axios.post(
+		// 	"https://zoom.us/oauth/token",
+		// 	querystring.stringify({ grant_type: 'account_credentials', account_id: config.ZOOM_ACCOUNT_ID}),
+		// 	{
+		// 		headers: {
+		// 			Authorization: `Basic ${Buffer.from(`${config.ZOOM_CLIENT_ID}:${config.ZOOM_CLIENT_SECRET}`).toString('base64')}`
+		// 		},
+		// 	},
+		// );
+		const reponse = await getUserTokenFunc();
+		token = reponse.access_token;
+		res.send(reponse.access_token);
 	} catch(error) {
 		console.log(error);
 		return res.sendStatus(400).send({message: "sth wrong"})
 	}
-});
+}));
 
 
 
